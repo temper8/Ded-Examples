@@ -14,26 +14,23 @@ def _():
 def _(mo):
     mo.md(
         r"""
-    ```
     Dedalus script computing the eigenmodes of waves on a clamped string.
     This script demonstrates solving a 1D eigenvalue problem and produces
     plots of the first few eigenmodes and the relative error of the eigenvalues.
     It should take just a few seconds to run (serial only).
 
     We use a Legendre basis to solve the EVP:
+    ```
         s*u + dx(dx(u)) = 0
         u(x=0) = 0
         u(x=Lx) = 0
+    ```
     where s is the eigenvalue.
 
     For the second derivative on a closed interval, we need two tau terms.
     Here we choose to use a first-order formulation, putting one tau term
     on an auxiliary first-order variable and another in the PDE, and lifting
     both to the first derivative basis.
-
-    To run and plot:
-        $ python3 waves_on_a_string.py
-    ```
     """
     )
     return
@@ -46,7 +43,6 @@ def _():
     import dedalus.public as d3
     import logging
     logger = logging.getLogger(__name__)
-
 
     # Parameters
     Lx = 1
@@ -72,8 +68,6 @@ def _(Lx, Nx, d3, dtype):
 
 @app.cell
 def _(Lx, d3, np, s, tau_1, tau_2, u, xbasis, xcoord):
-
-
     # Substitutions
     dx = lambda A: d3.Differentiate(A, xcoord)
     lift_basis = xbasis.derivative_basis(1)
@@ -94,22 +88,25 @@ def _(Lx, d3, np, s, tau_1, tau_2, u, xbasis, xcoord):
     n = 1 + np.arange(evals.size)
     true_evals = (n * np.pi / Lx)**2
     relative_error = np.abs(evals - true_evals) / true_evals
-
-
     return n, relative_error, solver
 
 
 @app.cell
-def _(dist, n, np, plt, relative_error, solver, u, xbasis):
+def _(n, plt, relative_error):
     # Plot
     plt.figure(figsize=(6, 4))
     plt.semilogy(n, relative_error, '.')
     plt.xlabel("eigenvalue number")
     plt.ylabel("relative eigenvalue error")
     plt.tight_layout()
-    plt.savefig("eigenvalue_error.pdf")
-    plt.savefig("eigenvalue_error.png", dpi=200)
+    #plt.savefig("eigenvalue_error.pdf")
+    #plt.savefig("eigenvalue_error.png", dpi=200)
+    plt.show()
+    return
 
+
+@app.cell
+def _(dist, np, plt, solver, u, xbasis):
     plt.figure(figsize=(6, 4))
     x = dist.local_grid(xbasis)
     for nn, idx in enumerate(np.argsort(solver.eigenvalues)[:5], start=1):
