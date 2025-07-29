@@ -1,2 +1,2 @@
-# -Ded-Examples
-Examples from  Dedalus Project
+# Dedalus Examples
+Examples from  Dedalus Project adopted for marimo
